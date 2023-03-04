@@ -1,0 +1,871 @@
+%\documentclass[a4paper,fleqn]{cas-sc} %会导致公式不居中
+\documentclass[a4paper]{cas-sc}
+% If the frontmatter runs over more than one page
+% use the longmktitle option.
+
+%\documentclass[a4paper,fleqn,longmktitle]{cas-sc}
+
+%\usepackage[numbers]{natbib}
+%\usepackage[authoryear]{natbib}
+\usepackage[authoryear,longnamesfirst]{natbib}
+\usepackage{amsmath}
+\usepackage{booktabs}
+%%%Author macros
+\def\tsc#1{\csdef{#1}{\textsc{\lowercase{#1}}\xspace}}
+\tsc{WGM}
+\tsc{QE}
+%%%
+
+% Uncomment and use as if needed
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newdefinition{rmk}{Remark}
+%\newproof{pf}{Proof}
+%\newproof{pot}{Proof of Theorem \ref{thm}}
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+
+% Short title
+\shorttitle{<short title of the paper for running head>}    
+
+% Short author
+\shortauthors{<short author list for running head>}  
+
+% Main title of the paper
+\title [mode = title]{Action Recognition Oriented Video Compression with Spatial-Temporal Stream Mapping Network}  
+
+% Title footnote mark
+% eg: \tnotemark[1]
+%\tnotemark[<tnote number>] 
+
+% Title footnote 1.
+% eg: \tnotetext[1]{Title footnote text}
+%\tnotetext[<tnote number>]{<tnote text>} 
+
+% First author
+%
+% Options: Use if required
+% eg: \author[1,3]{Author Name}[type=editor,
+%       style=chinese,
+%       auid=000,
+%       bioid=1,
+%       prefix=Sir,
+%       orcid=0000-0000-0000-0000,
+%       facebook=<facebook id>,
+%       twitter=<twitter id>,
+%       linkedin=<linkedin id>,
+%       gplus=<gplus id>]
+
+%\author[<aff no>]{<author name>}[<options>]
+
+% Corresponding author indication
+%\cormark[<corr mark no>]
+
+% Footnote of the first author
+%\fnmark[<footnote mark no>]
+
+% Email id of the first author
+%\ead{<email address>}
+
+% URL of the first author
+%\ead[url]{<URL>}
+
+% Credit authorship
+% eg: \credit{Conceptualization of this study, Methodology, Software}
+%\credit{<Credit authorship details>}
+
+% Address/affiliation
+%\affiliation[<aff no>]{organization={},
+%            addressline={}, 
+%            city={},
+%          citysep={}, % Uncomment if no comma needed between city and postcode
+%            postcode={}, 
+%            state={},
+%            country={}}
+
+%\author[<aff no>]{<author name>}[<options>]
+
+% Footnote of the second author
+%\fnmark[2]
+
+% Email id of the second author
+%\ead{}
+
+% URL of the second author
+%\ead[url]{}
+
+% Credit authorship
+%\credit{}
+
+% Address/affiliation
+%\affiliation[<aff no>]{organization={},
+%            addressline={}, 
+%            city={},
+%          citysep={}, % Uncomment if no comma needed between city and postcode
+%            postcode={}, 
+%            state={},
+%            country={}}
+
+% Corresponding author text
+\cortext[1]{Corresponding author}
+
+% Footnote text
+\fntext[1]{}
+
+% For a title note without a number/mark
+%\nonumnote{}
+
+% Here goes the abstract
+\begin{abstract}
+  With the widespread deployment of IoT monitoring terminals, 
+  massive amounts of videos are accumulated every day and transmitted to cloud servers or edge servers for processing 
+  or analysis. 
+  Action recognition is the core module of intelligent surveillance and the basis of other CV tasks. 
+  Although the development of deep learning has brought the action recognition methods closer to the 
+  recognition performance of human brain, 
+  these methods need to fully decode the video and consume huge computing and storage resources.
+  However, the high computation and vast hardware resource requirements of these methods make them unsuitable for implementation at edge servers with
+  limited computation and caching capacities while achieving low-latency and high-precision analysis. \\
+  In order to solve the problem of low-latency and high action recognition oriented compression efficiency  
+  on edge servers, 
+  this paper develops a compression-ROM network based on two-stream convolutional network. 
+  The ROM network directly extracts semantic information from the compressed features to complete action recognition.\\
+  Our framework is trained and evaluated on the standard video actions benchmarks of UCF-101.  
+  Experiments show that the proposed method generally exhibits better
+  rate-accurancy performance than the standard HEVC and VVC compression
+  methods.
+  Moreover, since there is no need to decode videos,it meets the requirements of low latency, low computing and storage resources,
+  enabling the network to be implmented at edge servers.
+\end{abstract}
+
+% Use if graphical abstract is present
+%\begin{graphicalabstract}
+%\includegraphics{}
+%\end{graphicalabstract}
+
+% Research highlights
+ 
+
+%\begin{highlight s}
+%\item 
+%\item 
+%\item 
+%\end{highlights}
+
+% Keywords
+% Each keyword is seperated by \sep
+\begin{keywords}
+  Action recognition\sep 
+  Image compression\sep
+  Video compression\sep
+  Two-stream convolutional networks\sep 
+  Deep learning\sep
+\end{keywords}
+
+\maketitle
+
+% Main text
+\section{Introduction}
+With the emergence and development of the Internet of Things era,
+it has brought about a sharp increase in the number of intelligent monitoring systems, 
+resulting in the production of an immense number of videos. 
+On the other hand,high-level CV tasks such as classification, detection, segmentation, tracking, etc,
+have been well addressed by deep neural networks and play
+a vital role in the intelligent industry, smart home, security
+monitoring and medical safety monitoring systems. 
+In these applications, a large amount of video or image data is compressed and transmitted from the monitoring terminal to the cloud 
+servers or edge servers for intelligent analysis, which can greatly liberate manpower and improve processing speed. 
+Therefore, to meet the transmission requirements between machines in many scenarios of the IoT , 
+compression methods for machines are urgently needed, and the goal of compression will also be changed from providing images and videos 
+with high human visual quality to  improving machine analysis accuracy for these applications.\\
+
+MPEG (Motion Picture Experts Group) has launched a new coding standard development activity: 
+Video Coding for Machine. Currently, most VCM algorithms focus on images. 
+\cite{duan2020video}, \cite{chen2019toward}, \cite{singh2020end} directly compress the features extracted by VGG \cite{simonyan2014very}
+or ResNet \cite{he2016deep}, 
+and the decoder side can perform inference and prediction directly from these features. 
+\cite{torfason2018towards}, \cite{shen2018codedvision} first compress the input image into features from the encoder, and use the compressed features for 
+image reconstruction and image understanding at the decoder side, respectively. \cite{hu2020towards} used two autoencoders to compress the 
+input image separately for face detection, the compressed features obtained by one encoder were used for face detection, 
+and the compressed features obtained by the two encoders were channel-wise merged together for image reconstruction. 
+\cite{choi2021latent}, \cite{choi2022scalable} use an autoencoder to compress the input image, and split the compressed features into two parts on the channel, 
+where the base layer is used for CV tasks, and the enhancement layer together with the base 
+layer is used for image reconstruction.\\
+
+Although the image oriented VCM algorithms have achieved good results, 
+in many application scenarios of the IoT, 
+a large number of tasks are based on videos (such as action recognition, object tracking, etc.), 
+but the video oriented VCM algorithms are few and far between. 
+Since the video compression methods and the video understanding methods are more complex than the image, 
+effectively combining the complex models of the two tasks is the key difficulty of the problem. Moreover, 
+since deep networks consume a lot of computing and storage resources and energy, 
+they can only be deployed on cloud servers or edge servers. Considering the large number of monitoring terminals, 
+limited channel capacity and the requirements of transmission time and so on, 
+it is now more inclined to perform tasks such as action recognition on edge servers with limited computation and storage capacity
+which are deployed closely to the terminal devices.
+Therefore, how to achieve efficient action recognition at edge servers urgently needs to be addressed.\\
+
+In this paper, 
+we propose an action recognition oriented video compression methods based on two stream convolutional network \cite{simonyan2014two} suitable 
+for edge-end collaborative scenario in which the distributed edge servers located near the monitoring terminals are 
+mainly responsible for executing action recognition:
+on the monitoring terminals, we use two auotencoders based on VAE.The autoencoder of spatial streanm is an image encoder 
+to compress I frames of videos which contains the spatial information of the video for action recognition, 
+the temporal stream is an optical flow encoder for encoding optical flow used for motion estimation which will provide more specific and accurate 
+temporal information than motion vectors; 
+on the edge servers, 
+we use an action recognition oriented mapping network to transform compressed features generated from encoders to features which are easier
+for machine to analysis.Then, these features wil be sent to the back-end of action recognition backbone based on two stream convolutional 
+network to obtain spaial and temporal action recognition scores,respectively. 
+A weighted combination of the resulting classification scores. 
+
+Each stream of our model is jointly optimized end-to-end using a single loss function. 
+The experiments shows that this approach is comparable to traditional video compression methods such as HEVC \cite{sullivan2012overview}, 
+VVC \cite{bross2021overview}, etc in terms of 
+action recognition oriented compression efficiency(i.e., rate-accurancy performance), while achieving a balance between compression efficiency, computational complexity,
+storage resources and processing time.
+
+
+
+\section{Related works}
+\subsection{End -to-end video compression methods}
+Over the past few decades, a series of video compression standards have been established, 
+such as: H.264 \cite{wiegand2003overview}, HEVC \cite{sullivan2012overview}, VVC \cite{bross2021overview}, etc. 
+The traditional video compression methods use the hybrid video coding framework, 
+which eliminates spatial redundancy and inter-frame predictive coding through intra-frame coding, 
+effectively reduces the video bit rate under certain distortion, and lays the foundation for video transmission and storage. \\
+
+Recently, many end-to-end optimized image compression methods \cite{agustsson2017soft}, \cite{balle2016end}, \cite{balle2018variational},
+\cite{johnston2018improved}, \cite{toderici2015variable}, \cite{toderici2017full},
+have achieved a competitive compare wirh traditional compression standards such as JPEG \cite{wallace1991jpeg} or JPEG2000 \cite{skodras2001jpeg} . 
+Therefore, video compression methods based on deep learning have also become the focus of attention. 
+Hu et al . \cite{lu2019dvc} first proposed a end-to-end optimized video compression framework. 
+It uses the hybrid video coding framework adopted by traditional compression methods but all components are replaced by 
+convolutional neural networks.
+Thanks to the technologies which are not used in traditional compression methods such as highly nonlinear transformations, 
+end-to-end joint optimization and the use of optical flow instead of motion vectors.
+it achieve a better performance than the traditional video compression standards such as H.264 
+in rate-distortion, and can be competitive to H.265. 
+\cite{hu2021fvc} performs the main operations (i.e. motion estimation, motion compression, motion compensation and residual compression) 
+on the feature space, and proposes a feature space video coding network (FVC).
+[] argue that existing methods compress video frames using only a small number of reference frames,
+which limits their ability to fully exploit temporal correlations between video frames. 
+To overcome this shortcoming, a recursive learning video compression (RLVC) method based on recursive autoencoder (RAE) 
+and recursive probabilistic model (RPM) is proposed. 
+RAE employs recurrent units in both encoder and decoder. 
+Thus, temporal information in a wide range of frames can be used to generate latent representations and reconstruct compressed outputs,
+while the proposed RPM network iteratively estimates the probability mass function (PMF) of latent representations conditioned 
+on the distribution of previous latent representations. 
+Due to the correlation between consecutive frames, 
+the conditional cross-entropy may be lower than the independent cross-entropy, thus reducing the bit rate.
+[] proposed a scale-space flow, 
+adding a scale parameter to the optical flow, enabling the network to better eliminate the uncertainty 
+caused by video shooting and environment. In [] , 
+the basic idea is to realize spatiotemporal energy compression in video compression. 
+A penalty based on spatial energy compression is added to the loss function, 
+and based on the temporal energy distribution, 
+the number of frames in an interpolation loop is selected to adapt to the motion characteristics of the video content and achieve 
+higher coding efficiency.
+
+\subsection{Learning-based action recognition methode}
+\subsubsection{Two-stream methods}
+Accurate spatiotemporal features play an important role in action recognition. 
+To obtain these spatiotemporal features, a new two stream convolutional network structure was developed in \cite{simonyan2014two}, 
+\cite{cai2018multi}, 
+including two branches to extract RGB features and optical flow features. 
+The single-frame RGB image sampled in the video is used to extract spatial features, 
+while the input optical flow (Optical Flow) is used to extract temporal features. 
+The author uses two convolutional neural networks to extract spatial and temporal features and perform inference and prediction. 
+Finally, the classification scores are weighted and combined to obtain the final classification result. 
+Based on the two stream structure, \cite{jaderberg2015spatial} proposed a random sparse frame sampling strategy to improve the recognition performance of 
+long-duration actions. 
+To avoid using optical flow, 1D convolution and 2D convolution are adopted in \cite{jiang2019stm} to extract spatiotemporal features in parallel.
+Compared with the optical flow algorithm, the calculation speed and storage space have been significantly improved, 
+but the recognition accuracy is limited. 
+To improve the accuracy of 2D Convolutional Neural Networks (CNN) in action recognition, 
+the algorithms in \cite{lin2019tsm} propose TSM (Time Shift Module), 
+by exchanging the feature information of some channels in the temporal dimension without increasing additional network parameters 
+and computation amount enhance the temporal correlation of adjacent frames and achieve the purpose of simultaneously 
+extracting temporal and spatial features. 
+The computation speed, model complexity and storage amount are comparable to those of the two-dimensional convolutional network.
+It has obvious advantages over other recognition algorithms, 
+but the performance of the model still lags far behind the most advanced recognition algorithms .
+
+\subsubsection{3D convolutional network-based methods}
+To simultaneously extract spatial and temporal features , 
+a 3D convolutional network based method is proposed . It was first proposed in \cite{tran2015learning}, 
+which added a temporal dimension to the 2D convolution kernel, 
+and then applied the 3D convolution kernel to process the input video. To further improve the efficiency of action recognition, 
+\cite{tran2018closer} decomposed the 3D convolutional network into a 2D spatial convolutional network and a 1D temporal convolutional network. 
+Although the amount of network parameters is the same as in \cite{tran2015learning} , the number of nonlinear units 
+is twice that of the latter, 
+which can better describe complex functions and make the network easier to optimize due to the spatiotemporal decomposition. 
+In order to solve the problem that the pre-trained parameters of 2D convolutional networks and the excellent performance of 2D networks
+proposed on image tasks cannot be reused by 3D convolutional networks, 
+the authors proposed a dilated 3D convolutional network in \cite{carreira2017quo}. 
+First, in order to reduce the training difficulty of 3D convolutional network, 
+the pre-training parameters of 2D convolutional network on ImageNet are extended to 3D convolution. 
+\cite{feichtenhofer2019slowfast} proposed that SlowFastNet also includes two 3D Convolution branch. 
+Significant progress has been made in recognizing actions of different durations by separately extracting low-frequency 
+spatial semantic information and high-frequency temporal information .
+
+\subsubsection{Compressed domain based methods}
+Since the motion vector(MV) in the compressed video contains  motion information without additional computation and
+can be used to replace the computationally expensive optical flow , 
+people focus on the compressed video . 
+In \cite{zhang2016real}. \cite{zhang2018real} , the two-stream architecture is accelerated by replacing optical flow with MV , 
+and the temporal features extracted by the optical flow convolutional network are used 
+as a guide to supervise motion vector convolutional network learning to further improve its performance.
+However, the incomplete temporal information contained in MV leads to a lower upper limit of model performance. 
+In \cite{wu2018compressed} , the two stream convolution network \cite{simonyan2014two} is extended to three branches : I -frame image , MV and residual image . 
+In \cite{dos2020faster} , the residual image with less impact on accuracy was abandoned , 
+and directly used the discrete cosine transform of I-frames and the MV of P -frames are used for training. 
+Due to code I-Frame and MV need to be divided into blocks and directly process frequency domain information , etc., 
+it is difficult to effectively obtain temporal and spatial information . 
+\cite{li2021towards} adds a temporal enhancement module to each branch on the basis of \cite{wu2018compressed} , 
+and predicts the feature information of the next data packet according to the currently received data packet, 
+which can achieve a better action recognition effect with a small amount of data loss. 
+In \cite{huo2019mobile}, for I The frame image, 
+MV and residual image are designed with a multimodal decomposition bilinear ( MFB ) module and bilinear pooling 
+is used to fuse these three parts of features to help the whole video semantic understanding . 
+\cite{shou2019dmc} utilized optical flow to train a discriminative motion cue generator ( DMC ) to improve the performance of action recognition. 
+SlowFastNet is applied in \cite{li2020slow} which proposed that the sparse sampling slow branch of I-frame and 
+the dense sampling fast branch of pseudo optical flow of P frame greatly improve the performance of long-term action recognition, 
+but introduce a large amount of network parameter calculation.
+
+\section{Proposed methods}
+\subsection{Overall framework}
+This paper proposes a video compression framework based on two-stream convolutional network 
+with recognition oriented mapping networks to improve the action recognition accuracy at the edge servers.\\
+
+The framework of the proposed method is shown in Fig.1. 
+The upper part is the spatial stream while the lower part is the temporal stream.
+Each part of the framework consists of three convolutional networks:compression network,ROM(recognition oriented mapping) network and the back-end of the backbone
+(i.e., two-stream convolutional network). 
+The spatial stream compresses and performs action recognition from I frames, 
+while the temporal stream is trained to compress and recognize action from motion in the form of dense
+optical flow. 
+Finally,each stream will get softmax scores of the corresponding video, which will be combined by late fusion(i.e., class score fusion).\\
+Under this framework, a feature loss instead of pixel-domain distortion loss is adopted to jointly guide the ROM network
+and encoding network of each part for bits saving and accuracy improving.
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.1]{fig//1.eps}
+	  \caption{Overall framework}\label{fig.1}
+\end{figure}
+
+The proposed video compression framework is action recognition oriented,
+and we directly perform the action recognition on the compressed feature $\hat{y}$ and $\hat{m}$ extracted by the autoencoders,
+but $\hat{y}$ and $\hat{m}$ do not match any intermediate layer features of the action recognition backbone. 
+There is a big difference between features for compression 
+and those for CV tasks such as recognition and classification, etc. 
+Fig.2 is a visual representation of the two features. 
+Compressed features are designed to eliminate the spatial redundancy in the image or optical flow,
+to eliminate the spatial dependencies between the spatially adjacent elements of the compressed features.
+However, the features for CV tasks have strong spatial correlation, such as showing obvious peaks,
+and this feature is easy for machines to analyze and process to complete high-level vision tasks.\\
+
+Since the purpose of our method is to achieve higher acion recognition accuracy not
+higher human visual quality, we do not have to employ a reconstruction model to recover pixel-domain video. 
+Therefore, in order to make the compressed features directly perform high-level visual tasks such as action recognition, 
+we introduce ROM  network to directly 
+convert the compressed features $\hat{y}$ and $\hat{m}$ into easily machine-analyzed features $z$ and $d$. 
+ $z$ and $d$ will be sent to the back-end of the corresponding backbone to get softmax scores of each stream.\\
+
+ \begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//2.eps}
+	  \caption{Illustration of compressed features and action recognition features}\label{fig.2}
+\end{figure}
+
+\subsection{Spatial stream compression-ROM network}
+\subsubsection{Spatial stream compression network}
+Input image $x$ is encoded by the Image Encoding NetWork $f_{se}$ into compressed features $y$ with size of  $320\times14\times14$ :
+
+\begin{equation}
+  \centering
+    y=f_{se}(x;\phi),
+\end{equation}
+
+where $f_{se}$ is the image encoding network and $\phi$ is the set of parameters of $f_{se}$ 
+that are learned from training data.The detailed structure of $f_{se}$ is shown in Fig.3.
+Then, $y$ will be quantized by the quantizer $Q$. In our experiment, the quantization is performed directly by taking round of each element:
+
+\begin{equation}
+  \centering
+    \hat{y}=Q(y)=round(y),
+\end{equation}
+
+Where $Q$ is the quantizer and $\hat{y}$ is the quantized features.Finally, 
+the quantized features $\hat{y}$  are entropy coding into bitstreams using arithmetic coding.
+Since the entropy coding is lossless, it can be decoded losslessly from the bitstream at the edge servers.
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//3.eps}
+	  \caption{Image Encoding Network. $Conv(3, 192 , \downarrow2)$ represents a convolutional layer, 
+              the size of the convolution kernel is $3\times3$, the number is $192$ , $\downarrow$ represents upsampling, 
+              and the stride is $2$. }\label{fig.3}
+\end{figure}
+
+\subsubsection{Spatial stream ROM network}
+$\hat{y}$ is converted into features $z$ with the spatial stream ROM network, 
+the size of $z$ is $2048\times7\times7$ .
+
+\begin{equation}
+  \centering
+    z=f_{sb}(\hat{y};\theta ),
+\end{equation}
+
+where $f_{sb}$ is the ROM network of spatial stream and $\theta$ is corresponding parameter set.The detailed structure of  $f_{sb}$
+is shown in Fig.4.
+$z$ refers to ROM features of spatial stream.Finally, 
+$z$ will be sent to the subsequent spatial stream back-end of backbone(the average pooling layer and fully connect layer of ResNet101) 
+to obtain the softmax scores of spatial stream.
+
+\begin{figure}[htb]
+	\centering
+		\includegraphics[scale=0.1]{fig//4.eps}
+	  \caption{Spatial stream ROM network . 
+            $Conv(3,512, \uparrow2)$ represents a convolutional layer, 
+            the kernel size of the convolution kernel is $3\times3$, the number of is $512$ , 
+            $\uparrow$ represents upsampling, and the stride is $2$. $ResBlock\times6$ represents the use of a set of Bottlenecks,
+            which has $6$ Bottlenecks, each of which will downsample the input features once $\/2$ 
+            and expand the number of channels to twice the original. }\label{fig.4}
+\end{figure}
+
+\subsection{Temporal stream compression-ROM network}
+\subsubsection{Temporal stream encoding network}
+视频编码包括I帧编码(Intra coding) 和帧间编码(inter-frame coding)。帧内编码可以有效地提取并压缩视频关键帧的空间信息，
+而帧间编码可以高效的提取视频的时间信息并结合帧内编码重建视频。
+帧间编码主要包括运动估计、运动补偿以及残差编码这几个部分。
+运动估计得到的光流或运动矢量则是视频时间信息的载体。
+而本文采用的双流网络恰好需要分别提取关键帧的空间信息和光流的时间信息共同完成动作识别。
+因此，我们使用光流作为运动估计的方法并使用一个光流编码器压缩时间信息。
+除此之外（Besides），Since the purpose
+of our method is to achieve higher recognition accuracy not
+higher human visual quality, we do not have to employ a
+reconstruction model to recover pixel-domain video.
+因此运动补偿和残差编码是不需要的。
+
+In addition, instead of encoding the optical flow in the horizon and vertical dircection of each frame, 
+we （stack the optical flow in the horizon and vertical direction of  ten frames in the way of Fig.5 
+to input the optical flow encoding network. 
+The input mode  is same as the temporal stream of backbone to facilitate subsequent optimization.）\\
+参考双流网络的写作方法。
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//5.eps}
+	  \caption{Optical flow stacking}\label{fig.5}
+\end{figure}
+
+The detailed structure of Optical flow Encoding NetWork  is shown in Fig.6.   
+Its structure is basically the same as that of the image encoding network. 
+Since the optical flow features are difficult to extract, an eight-layer convolutional layer is used as the encoder 
+while the image encoder only has three layers.
+Between the two adjacent convolutional layers is a GDN nonlinear normalization layer.\\
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//6.eps}
+	  \caption{Optical flow encoding network}\label{fig.6}
+\end{figure}
+
+$of$ is encoded by the network (Optical flow Encoding NetWork) $f_te$
+into a compressed feature $m$ with size of $512\times14\times14$ :
+
+\begin{equation}
+  \centering
+    m=f_{te}(of;\varphi),
+\end{equation}
+ 
+
+where: $of$ represents input optical flow; 
+$f_{te}$ represents optical flow encoder; 
+$m$ represents compressed optical flow feature.\\
+
+Then, $m$ is quantized by the quantizer :
+
+\begin{equation}
+  \centering
+    \hat{m}=Q(m)=round(m)
+\end{equation}
+					  
+In the formula: $m$ represents compressed optical flow feature; $Q$ is quantizer ; $\hat{m}$ represents quantized feature of $m$.
+Finally, $\hat{m}$ will be entropy encoded into the bitstream . 
+It can be decoded losslessly from the bitstream at the edge server .\\
+
+\subsubsection{Temporal stream ROM network}
+Temporal stream ROM transform is shown in Fig.7.
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.1]{fig//7.eps}
+	  \caption{Temporal stream ROM network}\label{fig.7}
+\end{figure}
+
+$\hat{m}$ is converted into features $d$, and the size of $d$ is $512\time28\times28$, 
+which is the same as the output  size of the $con3\_x$ of temporal stream of backbone:
+
+\begin{equation}
+  \centering
+    d=f_{tm}(\hat{m},\psi),
+\end{equation}
+In the formula: 
+$\hat{m}$ is the optical flow feature after lossless entropy decoding; 
+$f\_tm$ is temporal flow ROM network ;
+$d$ is the temporal stream ROM feature.\\
+
+Compared with the structure of the spatial stream ROM network, 
+it can be found that our temporal stream ROM network has only three convolutional layers, 
+and the output size of the bridge transform  is $512\times28\times28$ ,
+while the spatial flow ROM  has 39 layers, 
+The output size of the feature $z$ is $2048\times7\times7$ . 
+Due to the difficulty of extracting temporal information, 
+we have found through many experiments that it is very difficult to hope that the temporal stream ROM feature 
+directly similar or identical to the output of $conv5\_x$ of  the temporal stram of backbone  ,
+which will lead to a significant decrease in accuracy. 
+Therefore, we adjust the model multiple times finding  that $conv3\_x$ will lead to
+ the best accuracy . 
+After that, we send the $d$ to the $conv4\_x$ and $conv5\_x$ of the temporal stram network of backbone to extract deeper semantic features,
+and finally send it to the fully connected layer to get the classification score.\\
+
+\subsection{Training strategy}
+Our spatial stream and temporal stream compression-ROM networks are trained end-to-end separately. 
+Our loss function is constructed in rate-distortion based Lagrangian form:
+\begin{equation}
+  \centering   
+    Loss=\lambda{D}+R
+\end{equation}
+
+In the formula: $R$ represents bit rate; 
+$D$ represents distortions for different tasks, 
+we extend the human visual distortion of traditional image or video coding into the bridge transform feature 
+and the middle layer feature of the corresponding task, 
+generally using MSE loss function to measure ; 
+$\lambda$ represents lagrange multiplier to control the bit rate.
+Besides, R(ˆy) is the coding rates of ˆy, and λ is the
+trade-off between feature loss and coding rates. Following [5],
+[6], the coding rates are estimated by entropy of ˆy as:\\
+
+\subsubsection{Spatial stream training strategy}
+The training method of the spatial stream is shown in Figure 8 . 
+The specific steps of training are as follows:\\
+1) Obtain supervised features:input the original image $x$ into the spatial stram of the 
+pre-trained action recognition backbon front-end to extract features as supervised features;\\
+2) Encoding the original image and obtaining the bit rate $R(\hat{y})$: 
+send the same original image as the first step into our encoder to get the features $\hat{y}$ 
+and obtain the encoding code rate $R(\hat{y})$;\\
+3) Obtain ROM features $z$: 
+send the features of lossless entropy decoding $\hat{y}$ into the ROM to obtain $z$;\\
+4 ) The loss function is defined as follows:
+
+\begin{equation}
+  \centering
+    Loss\_s=\lambda{MSE}(z,z^{'})+R(\hat{y})
+\end{equation}
+
+In the formula: $Loss\_s$  represents spatial stream loss function; 
+$R(\hat{y})$ represents bit rate; $MSE(z,z^{'})$ represents the Euclidean distance of $z$ and $z^{'}$; 
+$\lambda$ represents the hyperparameter that controls the bit rate of image coding.\\
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.1]{fig//8.eps}
+	  \caption{Spatial stream training strategy}\label{fig.8}
+\end{figure}
+
+
+\subsubsection{Temporal stream training strategy}
+The training method of the temporal stream is shown in Figure 9. 
+The specific steps of training are as follows:\\
+1) Obtain supervised features:input the original optical flow $of$ into the into the temporal stream of the 
+pre-trained action recognition backbon front-end to extract features as supervised features;\\
+2) Encoding the original optical flow and obtaining the bit rate: 
+send $of$ as the first step into our encoder to get the features $\hat{m}$ and obtain the encoding bit rate $R(\hat{m})$;\\
+3) Obtain ROM features: 
+send the features of lossless entropy decoding $\hat{m}$ into the bridge-transform network to obtain $d$;\\
+4) The loss function is defined as follows:
+
+\begin{equation}
+  \centering
+    Loss\_m=\alpha{MSE}(d,d^{'})+R(\hat{m})
+\end{equation}
+
+In the formula: $Loss\_m$ represents time flow loss function; 
+$R(\hat{m})$ represents optical flow bit rate; 
+$MSE(d,d^{'})$ represents euclidean distance of $z$ and $z^{'}$;  
+$\alpha$ represents the hyperparameter that controls the bit rate of optical flow coding.\\                          
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.1]{fig//9.eps}
+	  \caption{Temporal stream training strategy}\label{fig.9}
+\end{figure}
+
+\section{Experiment}
+\subsection{Experimental setup}
+Our entire experiments are performed on the action recognition benchmark dataset $UCF101$ \cite{soomro2012ucf101}. 
+The $UCF101$ dataset provides $13320$ videos. 
+The frame rate of each video is 40 $fps$ , 
+the size of each frame image is $320\times240$ . 
+The official provides five data set division methods. 
+In this experiment, our action recognition backbone network and coding-bridge transform network are trained and tested 
+using the first division method. 
+Since the dataset video is saved in $avi$ format, in order to facilitate the input of the network, 
+we first use dense flow [40] to extract the optical flow of each frame of video and the horizontal $(x)$ and vertical $(y)$ 
+directions between two consecutive frames and saves them as images in JPEG format. 
+Below we describe the experimental setup of the spatial stream and temporal stream coding-bridge transform networks, respectively.\\
+
+\subsubsection{Experimental setup of spatial stream }
+The input image of spatial stream is randomly cropped to size $224\times224$ . 
+Our spatial stream coding-bridge transform network is first pretrained on the ImageNet dataset. 
+The batch size is $25$ , the initial learning rate is 1e -4 , then training is 360 epochs, 
+the learning rate is changed to $1\/10$ of the original every 60 epochs, 
+$\lambda$  is set to 15 . 
+When training the spatial stream, we randomly select three frames of each training video for training; 
+during testing, for each video, we sample an image every eleven frames and classify each frame of image.
+The scores are weighted and combined to get the final test scores.\\
+
+\subsubsection{Experimental setup of temporal stream }
+The input of the temporal stream will stack the optical flows 
+in horizontal and vertical directions extracted from $11$ consecutive frames of video as shown in Fig.3, 
+and then randomly crop them to a size of $224\times224$ . 
+When training the network, we randomly select one frame of the video as the starting frame, 
+and use the optical flow extracted from the next ten frames as the input . 
+When testing the network, we uniformly sample the video to get starting frames.
+Then we get the temporal stream classification score and make a weighted combination. 
+Table 1 shows other training parameter settings for the temporal flow network.\\
+
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{cccc}
+    \toprule
+    batch size & learning rate & epochs & $\alpha$\\
+    \midrule
+    32 & $10^{-5}$ & 900 & $50,100,150,200,250$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Temporal stream training settings}\label{tab.1}
+\end{table}
+
+After completing the end-to-end training of the temporal stream and spatial stream compression-ROM network respectively, 
+we will perform a linear weighted combination of the spatial stream test score and the temporal stream test score of the same video 
+and get the fused test score as the video's test score. final recognition result.\\
+
+\subsubsection{Comparative test setup}
+We also compare the proposed method with the traditional video coding standard HEVC and VVC . 
+Fig.10 shows the method of the comparative test. 
+We first use HEVC standard reference software HM-16.20 and VVC standard refrence software VVENC to 
+compress the test video with different compression rates.The QPs of HEVC are set to 24 , 28 , 30 , 32 , 36 respectively . 
+The QPs of VVC are set to 18,20,22,23,24, 28 respectively.  
+Then, we will use the dense flow on the decompressed video to extract the image and optical flow of each frame of the video, 
+and send them to the action recognition backbone network for testing. 
+Our action recognition backbone network is fully trained on the $UCF101$ dataset in advance, 
+and is not only used for testing in comparative experiments, 
+but also provides supervised features for supervised learning of the compression-ROM network. 
+In the experimental results, the original curve represents the test accuracy of the original test video in the well trained backbone 
+network.\\
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//10.eps}
+	  \caption{Comparative test settings}\label{fig.10}
+\end{figure}
+
+\subsection{Experimental results}
+We compare the proposed method with HEVC and VVC in terms of rate $(bpp)$ vs. accuracy on the UCF 101 dataset.\\
+
+\subsubsection{ Temporal stream comparison results}
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//11.eps}
+	  \caption{Temporal stream bpp vs. accurancy}\label{fig.11}
+\end{figure}
+
+Fig.11 shows the comparison results of temporal stream. 
+It can be found that the performance of our method on the temporal stream is significantly better than that of HEVC, 
+and the bit ratio is only $2\%$ accuracy loss at a very low bit rate $( 0.06 bpp)$, 
+while at the same bit rate using HEVC the accuracy loss is $12\%$, 
+indicating that the motion information described by the motion vector is rougher than the optical flow and contains larger noise, 
+which will affect the subsequent machine vision analysis, especially the extraction and analysis of time information.\\
+
+\subsubsection{ Two stream  fusion comparison results}
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//12.eps}
+	  \caption{Two stream fusion bpp vs. accurancy}\label{fig.12}
+\end{figure}
+
+Fig.12 shows the comparison results of two stream fusion. 
+It should be noted that the two stream fusion bit rate of the proposed method is not simply adding the spatial stream bit rate 
+and the temporal stream bit rate. 
+Because our GOP size is set to $11$ , that is, the I frame is encoded using the spatial stream network (intra-frame encoding), 
+and the subsequent 10 frames only encode their motion information (optical flow) for inter-frame encoding, 
+so the calculation method of the bit rate of two stream fusion should be the bit rate of the temporal stream 
+plus the bit rate of the spatial stream$\/11$ . 
+It can be seen from Fig.12 that our method is also better than HEVC and VVC in the fusion bpp vs. accuracy after 
+the weighted combination of two stream scores.\\
+
+\subsubsection{Feature visualization analysis}
+From the comparison of the previous experimental results, 
+it can be found that our method is generally better than HEVC and VVC in terms of bpp vs. accurancy, 
+especially the performance of temporal stream is significantly better than HEVC and VVC. 
+Therefore, we also analyze the reasons why the proposed method performs well.\\
+
+We visualized the features, as shown in Fig.13. 
+In Fig.13, we show the quantized features $\hat{m}$ of the optical flow coding network, 
+the features $d$ extracted by the well trained ROM network, 
+the features $d^{'}$ extracted by the pre-trained backbone, 
+and the features $d_{HEVC}$ extracted by the pre-trained backbone which were fed decompressed video by HEVC at the same bit rate. 
+The x-axis and y-axis represent the length and width of the feature, 
+and the z-axis represents the average of feature elements at the same position in the channel dimension. 
+It can be seen that there is no strong spatial correlation between the compressed feature $\hat{m}$ elements, 
+indicating that the encoding network effectively eliminates the spatial redundancy of optical flow; 
+while the features $d^{'}$ used for visual analysis have a more compact spatial distribution, 
+It is easier to analyze by machines; 
+$d$ and $d_{HEVC}$ are very similar to $d^{'}$, 
+indicating that the proposed method plays the role of reorganizing the compressed features into a form 
+that is easy for computer analysis for subsequent visual analysis such as classification.\\
+
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.3]{fig//13.eps}
+	  \caption{Feature visualization analysis}\label{fig.13}
+\end{figure}
+
+\subsubsection{Model performance analysis}
+Our method is generally significantly better than traditional methods such as HEVC and VVC in terms of bpp vs. accurancy. 
+Table 2 compares our method with DVC .DVC\_pro,DVC\_lite in terms of computational complexity, parameters amount and processed time.\\
+
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{ccc}
+    \toprule
+    Algorithms & FLOPs/G & Parms/M  \\
+    \midrule
+    Proposed & 141.69 & 105.2 \\
+    DVC & 180.61 & 96.63 \\
+    DVC\_Pro & 320.51 & 115.9 \\
+    DVC\_Lite & 62.81 & 89.2 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Comparison of FLOPs and Params}\label{tab.2}
+\end{table}
+
+
+
+       
+
+Table 3 shows how our method compares with other methods in the time required to process one frame.\\
+
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{cc}
+    \toprule
+    Algorithms & Time for processing one frame/s \\
+    \midrule
+    Proposed & 0.00458 \\
+    DVC & 0.0612 \\
+    VVENC & 0.31 \\
+    HM & 2.30 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Comparison of time for processing one frame}\label{tab.3}
+\end{table}
+
+It should be noted that both methods need to extract the optical flow, 
+so the time, computation and storage space required to extract the optical flow are not included.\\
+
+It can be seen intuitively from Tab.3 that since our method does not require decoding, 
+it does not need to spend extra time, computation and storage space on decoding the video. 
+Therefore, we believe that our proposed method meets the requirements of latency, 
+transmission bandwidth, computational complexity, and storage space.\\
+
+\section{Conclusion}
+
+At present, machine-to-machine data transmission based on machine vision will account for $50\%$ of global data transmission, 
+and with the development of artificial intelligence, this proportion will increase day by day. 
+In order to solve the communication requirements for machine vision tasks, 
+we propose an action recognition oriented video compression method based on two stream convolutional network for 
+the edge-end collaboration scenario of intelligent video surveillance, 
+which compromises video compression rate and classification accuracy, 
+and the conversion from compressed features to computer vision features is realized, 
+and by optimizing the bit rate and feature distortion end-to-end, 
+it allows to retain more information that is easy for machines to perform semantic analysis when encoding video images. 
+Experimental results show that its rbpp vs. accurancy performance can be compared with the traditional HEVC and VVC video coding standard. 
+Moreover, since there is no need for decoding and the model is relatively simple, 
+the processed time, 
+computational complexity and storage space required to complete the action recognition task on the edge server side are less 
+than those of traditional methods, 
+which meets the performance requirements proposed in the background. 
+To the best of our knowledge, this is the first learning-based video oriented VCM algorithm.
+% Numbered list
+% Use the style of numbering in square brackets.
+% If nothing is used, default style will be taken.
+%\begin{enumerate}[a)]
+%\item 
+%\item 
+%\item 
+%\end{enumerate}  
+
+% Unnumbered list
+%\begin{itemize}
+%\item 
+%\item 
+%\item 
+%\end{itemize}  
+
+% Description list
+%\begin{description}
+%\item[]
+%\item[] 
+%\item[] 
+%\end{description}  
+
+% Figure
+
+
+% Uncomment and use as the case may be
+%\begin{theorem} 
+%\end{theorem}
+
+% Uncomment and use as the case may be
+%\begin{lemma} 
+%\end{lemma}
+
+%% The Appendices part is started with the command \appendix;
+%% appendix sections are then done as normal sections
+%% \appendix
+
+
+
+% To print the credit authorship contribution details
+
+
+
+%% Loading bibliography style file
+%\bibliographystyle{elsarticle-num}
+\bibliographystyle{elsarticle-num}
+
+% Loading bibliography database
+\bibliography{myreference.bib}
+
+% Biography
+%\bio{}
+% Here goes the biography details.
+%\endbio
+
+%\bio{pic1}
+% Here goes the biography details.
+%\endbio
+
+\end{document}
+
